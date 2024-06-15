@@ -22,7 +22,7 @@ OPEN_METEO_METRICS_KEY = [
     tags=['open-meteo-etl'],
     start_date=pendulum.datetime(2015, 12, 1, tz="UTC"),
     params={
-        "open_meteo_URL": Param("", type="string"),
+        "open_meteo_url": Param("", type="string"),
         "influxdb_series_key": Param("", type="string"),
         "latitude": Param("", type="string"),
         "longitude": Param("", type="string"),
@@ -31,10 +31,11 @@ OPEN_METEO_METRICS_KEY = [
     },
     catchup=False
 )
-def forecast_weather_etl():
+def open_meteo_weather_etl():
     @task()
     def extract(**context):
         params = context["params"]
+        print(params)
 
         url_params = {
             "latitude": params["latitude"],
@@ -46,7 +47,7 @@ def forecast_weather_etl():
             "hourly": ",".join(OPEN_METEO_METRICS_KEY)
         }
         
-        response = requests.get(params["open_meteo_URL"], headers={}, params=url_params)
+        response = requests.get(params["open_meteo_url"], headers={}, params=url_params)
         return response.status_code, response.json()
 
     @task()
@@ -94,4 +95,4 @@ def forecast_weather_etl():
     transformed_data = transform(raw_data)
     load(transformed_data)
 
-forecast_weather_dag = forecast_weather_etl()
+open_meteo_weather_dag = open_meteo_weather_etl()
