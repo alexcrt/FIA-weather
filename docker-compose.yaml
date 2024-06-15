@@ -26,7 +26,7 @@ x-airflow-common:
     AIRFLOW_VAR_INFLUXDB_ORG: 'org.fia'
     AIRFLOW_VAR_INFLUXDB_BUCKET: 'weather_bucket'
     AIRFLOW_VAR_INFLUXDB_URL: 'http://influxdb:8086'
-    AIRFLOW_VAR_INFLUXDB_ACCESS_TOKEN: 'noXY7WIt9AvOdRSORPmapGlxr-wn_SDbw-7Hg_F5QzZ6thtqPkoUzBC3TAuRxa7y1caRNAgyF6g6xFOXY0_mrQ=='
+    AIRFLOW_VAR_INFLUXDB_ACCESS_TOKEN: '0zlif90RLs-1te6gDbk_jZq77rPvKDp-SdW6v1_DcX3AzWotIP3aV22f_icnbegIAEPkG3DxMs6-8LzTIL5X5g=='
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
