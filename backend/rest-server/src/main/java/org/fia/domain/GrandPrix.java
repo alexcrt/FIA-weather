@@ -4,12 +4,21 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Entity
+@Table(
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"track_id", "season_id"})
+    }
+)
 @Getter
 @Builder
 @AllArgsConstructor
@@ -126,5 +135,17 @@ public class GrandPrix implements Serializable {
             .q3(q3)
             .race(race)
             .build();
+    }
+
+    public List<Pair<String, TimedSession>> timedSessionsInOrder() {
+        // Help type inference
+        return Stream.<Pair<String, TimedSession>>of(
+                Pair.of("FP1", this.fp1), Pair.of("FP2", this.fp2), Pair.of("FP3", this.fp3),
+                Pair.of("SQ1", this.sprintQ1), Pair.of("SQ2", this.sprintQ2), Pair.of("SQ3", this.sprintQ3), Pair.of("SPRINT_RACE", this.sprintRace),
+                Pair.of("Q1", this.q1), Pair.of("Q2", this.q2), Pair.of("Q3", this.q3), Pair.of("RACE", this.race)
+            )
+            .filter(p -> p.getValue() != null)
+            .sorted(Comparator.comparingLong(p -> p.getValue().getStartingTimestamp()))
+            .toList();
     }
 }

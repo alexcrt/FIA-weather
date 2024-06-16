@@ -4,6 +4,7 @@ import org.fia.domain.Season;
 import org.fia.repository.SeasonRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -16,6 +17,6 @@ public class SeasonService {
     }
 
     public List<Season> getAllSeasons() {
-        return seasonRepository.findAll();
+        return seasonRepository.findAll().stream().sorted(Comparator.comparing(Season::getStartingYear)).toList();
     }
 }

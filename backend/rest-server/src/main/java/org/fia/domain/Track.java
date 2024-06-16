@@ -1,14 +1,13 @@
 package org.fia.domain;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.fia.converter.ZoneOffsetConverter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Entity
@@ -22,10 +21,13 @@ public final class Track {
     private String name;
     private String latitude;
     private String longitude;
+    @Convert(converter = ZoneOffsetConverter.class)
+    private ZoneOffset zoneOffset;
 
-    public Track(String name, String latitude, String longitude) {
+    public Track(String name, String latitude, String longitude, ZoneOffset zoneOffset) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.zoneOffset = zoneOffset;
     }
 }
