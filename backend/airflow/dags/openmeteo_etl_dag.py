@@ -2,9 +2,11 @@ import influxdb_client
 import os
 import pendulum
 import requests
+import pandas as pd
 
 from airflow.decorators import dag, task
 from airflow.models.param import Param
+from datetime import datetime, timezone
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 
@@ -17,6 +19,19 @@ OPEN_METEO_METRICS_KEY = [
     "temperature_2m", "relative_humidity_2m", "rain", "surface_pressure", 
     "wind_speed_10m", "wind_speed_100m", "wind_direction_10m", "wind_direction_100m"
 ]
+
+
+# Interpolate data points every minute linearly
+def interpolate(data_points):
+    df = pd.DataFrame(data_points)
+    df['time'] = df['time'].map(lambda timestamp: datetime.fromtimestamp(timestamp, tz=timezone.utc))
+    df.set_index('time', inplace=True)
+    
+    df_resampled = df.resample('1min').interpolate(method='linear')
+    interpolated_data_points = df_resampled.reset_index()
+    interpolated_data_points['time'] = interpolated_data_points['time'].map(lambda datetime: int(datetime.timestamp()))
+
+    return interpolated_data_points.to_dict(orient='records')
 
 @dag(
     tags=['open-meteo-etl'],
@@ -35,7 +50,6 @@ def open_meteo_weather_etl():
     @task()
     def extract(**context):
         params = context["params"]
-        print(params)
 
         url_params = {
             "latitude": params["latitude"],
@@ -56,11 +70,6 @@ def open_meteo_weather_etl():
         if status_code != 200:
             return None
 
-        metadata = {
-            "latitude": data["latitude"],
-            "longitude": data["longitude"]
-        }
-
         data_points = []
 
         for i, time in enumerate(data["hourly"]["time"]):
@@ -68,19 +77,21 @@ def open_meteo_weather_etl():
             data_point.update({key: data["hourly"][key][i] for key in OPEN_METEO_METRICS_KEY})
             data_points.append(data_point)
 
-        return metadata, data_points
+        interpolated_data = interpolate(data_points)
+        return interpolated_data
 
     @task()
-    def load(transformed_data: (dict, dict), **context):
+    def load(transformed_data: dict, **context):
         if transformed_data is None:
             return None
 
         params = context["params"]
 
-        metadata, data_points = transformed_data
+        data_points = transformed_data
+
         points = []
         for data_point in data_points:
-            point = influxdb_client.Point(params["influxdb_series_key"]).tag("latitude", metadata["latitude"]).tag("longitude", metadata["longitude"])
+            point = influxdb_client.Point(params["influxdb_series_key"]).tag("latitude", params["latitude"]).tag("longitude", params["longitude"])
             for metric_key in OPEN_METEO_METRICS_KEY:
                 point = point.field(metric_key, data_point[metric_key])
             point = point.time(data_point["time"], influxdb_client.WritePrecision.S)

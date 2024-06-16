@@ -110,44 +110,39 @@ public class AirflowDagService {
         }
         List<Map<String, Object>> runs = new ArrayList<>();
 
-        // From the historical weather API: You can access data dating back to 1940 with a delay of 2 days.
-        long twoDaysAgo = LocalDateTime.now().minusDays(2).toEpochSecond(ZoneOffset.UTC) / 1000;
         for (TimedSession timedSession : timedSessionList) {
-            if (timedSession.getEndingTimestamp() <= twoDaysAgo) {
-                runs.add(triggerHistoricalDag(grandPrix, timedSession));
-            } else {
-                runs.add(triggerForecastDag(grandPrix, timedSession));
-            }
+            runs.add(triggerDag(grandPrix, timedSession));
         }
         return runs;
     }
 
-    private Map<String, Object> triggerHistoricalDag(GrandPrix grandPrix, TimedSession timedSession) {
+    public Map<String, Object> triggerDag(GrandPrix grandPrix, TimedSession timedSession) {
         LocalDate startDate = Instant.ofEpochSecond(timedSession.getStartingTimestamp()).atZone(ZoneOffset.UTC).toLocalDate();
         LocalDate endDate = Instant.ofEpochSecond(timedSession.getEndingTimestamp()).atZone(ZoneOffset.UTC).toLocalDate();
         Track track = grandPrix.getTrack();
-        return triggerDag(
-            OPEN_METEO_HISTORICAL_API_URL,
-            INFLUX_DB_HISTORICAL_SERIES_KEY,
-            track.getLatitude(),
-            track.getLongitude(),
-            startDate,
-            endDate
-        );
-    }
 
-    private Map<String, Object> triggerForecastDag(GrandPrix grandPrix, TimedSession timedSession) {
-        LocalDate startDate = Instant.ofEpochSecond(timedSession.getStartingTimestamp()).atZone(ZoneOffset.UTC).toLocalDate();
-        LocalDate endDate = Instant.ofEpochSecond(timedSession.getEndingTimestamp()).atZone(ZoneOffset.UTC).toLocalDate();
-        Track track = grandPrix.getTrack();
-        return triggerDag(
-            OPEN_METEO_FORECAST_API_URL,
-            INFLUX_DB_FORECAST_SERIES_KEY,
-            track.getLatitude(),
-            track.getLongitude(),
-            startDate,
-            endDate
-        );
+        // From the historical weather API: You can access data dating back to 1940 with a delay of 2 days.
+        long twoDaysAgo = LocalDateTime.now().minusDays(2).toEpochSecond(ZoneOffset.UTC);
+
+        if (timedSession.getEndingTimestamp() <= twoDaysAgo) {
+            return triggerDag(
+                OPEN_METEO_HISTORICAL_API_URL,
+                INFLUX_DB_HISTORICAL_SERIES_KEY,
+                track.getLatitude(),
+                track.getLongitude(),
+                startDate,
+                endDate
+            );
+        } else {
+            return triggerDag(
+                OPEN_METEO_FORECAST_API_URL,
+                INFLUX_DB_FORECAST_SERIES_KEY,
+                track.getLatitude(),
+                track.getLongitude(),
+                startDate,
+                endDate
+            );
+        }
     }
 
     private Map<String, Object> triggerDag(String openMeteoURL, String influxSeriesKey, String latitude, String longitude, LocalDate startDate, LocalDate endDate) {

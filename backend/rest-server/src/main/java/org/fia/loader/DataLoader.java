@@ -11,6 +11,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,16 +42,16 @@ public class DataLoader implements ApplicationRunner {
     }
 
     public Map<Integer, Season> createSeasons() {
-        return IntStream.range(2018, 2025)
+        return IntStream.range(2024, 2025)
             .mapToObj(Season::new)
             .collect(Collectors.toMap(Season::getStartingYear, season -> season));
     }
 
     public Map<String, Track> createTracks() {
         return Stream.of(
-            new Track("Monaco", "43.738347784533", "7.424450755119324"),
-            new Track("Monza", "45.5845001", "9.2744485"),
-            new Track("Canada", "45.501648", "-73.528145")
+            new Track("Monaco", "43.738347784533", "7.424450755119324", ZoneOffset.ofHours(1)),
+            new Track("Monza", "45.5845001", "9.2744485", ZoneOffset.ofHours(1)),
+            new Track("Canada", "45.501648", "-73.528145", ZoneOffset.ofHours(-4))
         ).collect(Collectors.toMap(Track::getName, track -> track));
     }
 }

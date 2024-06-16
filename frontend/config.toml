@@ -1,0 +1,9 @@
+# https://discuss.streamlit.io/t/streamlit-doesnt-reload-site-when-code-in-container-changes/46174/2
+[server]
+runOnSave = true
+# you will need this if running docker on windows host:
+fileWatcherType = "poll"
+
+[browser]
+# Whether to send usage statistics to Streamlit.
+gatherUsageStats = false
