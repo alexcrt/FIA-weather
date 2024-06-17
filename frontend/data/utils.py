@@ -39,3 +39,16 @@ def create_metrics_info_and_plotly_chart(weather_data_report):
 def convert_datetime_to_ISO_8601(date, time):
 	combined_datetime = datetime.combine(date, time)
 	return combined_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+
+def compute_grand_prix_date_range(starting_date, ending_date):
+	starting_month, starting_day = datetime.strptime(starting_date, '%Y-%m-%d').strftime("%B %d").split(" ")
+	ending_month, ending_day = datetime.strptime(ending_date, '%Y-%m-%d').strftime("%B %d").split(" ")
+
+	months = ""
+	days = f"{starting_day}-{ending_day}"
+	if starting_month == ending_month:
+	    months = starting_month[:3]
+	else:
+	    months = f"{starting_month[:3]} - {ending_month[:3]}"
+
+	return months, days

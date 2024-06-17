@@ -4,6 +4,7 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
+import org.apache.commons.lang3.tuple.Pair;
 import org.fia.bean.TimeSeries;
 import org.fia.bean.WeatherDataReport;
 import org.fia.domain.GrandPrix;
@@ -14,6 +15,7 @@ import org.fia.service.result.GrandPrixWeatherResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -55,12 +57,15 @@ public class WeatherService {
             }
             weatherDataReportList.put(timedSessionData.getKey(), weatherDataReport);
         }
+        Pair<LocalDate, LocalDate> grandPrixDateRange = grandPrix.dateRange();
         return Optional.of(new GrandPrixWeatherResult(
             track.getName(),
             track.getZoneOffset(),
             track.getLatitude(),
             track.getLongitude(),
             grandPrix.isSprint(),
+            grandPrixDateRange.getLeft(),
+            grandPrixDateRange.getRight(),
             weatherDataReportList)
         );
     }

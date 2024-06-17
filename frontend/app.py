@@ -33,7 +33,8 @@ with st.sidebar:
 
 if weather_result:    
     st.header(f"{weather_result['trackName']}")
-
+    months, days = utils.compute_grand_prix_date_range(weather_result['startingDate'], weather_result['endingDate'])
+    st.metric(months, days)
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Zone offset", f"{weather_result['zoneOffset']} (UTC)")

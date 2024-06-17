@@ -8,6 +8,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -135,6 +138,14 @@ public class GrandPrix implements Serializable {
             .q3(q3)
             .race(race)
             .build();
+    }
+
+    public Pair<LocalDate, LocalDate> dateRange() {
+        ZoneOffset zoneOffset = this.track.getZoneOffset();
+        return Pair.of(
+            LocalDateTime.ofEpochSecond(this.fp1.getEndingTimestamp(), 0, zoneOffset).toLocalDate(),
+            LocalDateTime.ofEpochSecond(this.race.getEndingTimestamp(), 0, zoneOffset).toLocalDate()
+        );
     }
 
     public List<Pair<String, TimedSession>> timedSessionsInOrder() {
