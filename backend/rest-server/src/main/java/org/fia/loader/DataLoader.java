@@ -88,7 +88,7 @@ public class DataLoader implements ApplicationRunner {
             new Track("Losail International Circuit", "25.4848", "51.4542", ZoneOffset.ofHours(3)),
             new Track("Circuit of the Americas", "30.1328", "-97.6401", ZoneOffset.ofHours(-5)),
             new Track("Autódromo Hermanos Rodríguez", "19.4042", "-99.0907", ZoneOffset.ofHours(-6)),
-            new Track("Interlagos (Autódromo José Carlos Pace)", "-23.7010", "-46.6972", ZoneOffset.ofHours(-3)),
+            new Track("Interlagos", "-23.7010", "-46.6972", ZoneOffset.ofHours(-3)),
             new Track("Las Vegas Street Circuit", "36.1147", "-115.1728", ZoneOffset.ofHours(-7)),
             new Track("Yas Marina Circuit", "24.4672", "54.6031", ZoneOffset.ofHours(4))
         ).collect(Collectors.toMap(Track::getName, track -> track));
