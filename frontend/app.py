@@ -8,6 +8,7 @@ from sidebar import modules as sidebar_modules
 st.set_page_config(page_title = "FIA - Weather Application")
 # Streamlit interface
 st.title("Weather metrics")
+st.divider()
 
 weather_result = None
 
