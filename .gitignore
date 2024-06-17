@@ -215,5 +215,4 @@ dmypy.json
 cython_debug/
 
 # Airflow
-backend/opt/airflow/logs/*
-
+backend/airflow/logs/
